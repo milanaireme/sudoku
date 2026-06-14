@@ -283,7 +283,7 @@ input {
   grid-template-columns: repeat(9, minmax(0, 1fr));
   grid-template-rows: repeat(9, minmax(0, 1fr));
   gap: 0;
-  width: min(100%, 33rem, calc(100vh - 19rem));
+  width: min(100%, 31rem, calc(100vh - 20rem));
   aspect-ratio: 1;
   margin: 0 auto;
   border-radius: 24px;
@@ -627,6 +627,41 @@ input {
   background: rgba(248, 237, 209, 0.74);
   backdrop-filter: blur(10px);
   z-index: 10;
+}
+
+.session-overlay[hidden] {
+  display: none;
+}
+
+.page-shell.focus-mode .topbar,
+.page-shell.focus-mode .side-stack,
+.page-shell.focus-mode .panel-head,
+.page-shell.focus-mode .status-strip,
+.page-shell.focus-mode .tool-row,
+.page-shell.focus-mode .pin-row {
+  filter: blur(7px);
+  opacity: 0.26;
+  pointer-events: none;
+  transition: filter 180ms ease, opacity 180ms ease;
+}
+
+.page-shell.focus-mode .board-frame,
+.page-shell.focus-mode .number-row {
+  position: relative;
+  z-index: 2;
+  filter: none;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.page-shell.focus-mode .board-frame {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.45),
+    0 18px 36px rgba(32, 49, 57, 0.12);
+}
+
+.page-shell.focus-mode .number-row {
+  justify-content: center;
 }
 
 .session-card {

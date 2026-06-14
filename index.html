@@ -75,6 +75,7 @@
                 <span class="mode-pill" id="stage-state">Stage 1</span>
                 <span class="mode-pill" id="notes-state">Notes off</span>
                 <span class="mode-pill" id="pin-state">Pin off</span>
+                <span class="mode-pill" id="hint-state">Hints 0/3 used, 3 left</span>
               </div>
             </div>
 
@@ -84,7 +85,7 @@
               <button type="button" class="tool-button" id="undo-move">Undo</button>
               <button type="button" class="tool-button" id="hint">Hint</button>
               <button type="button" class="tool-button" id="check">Check</button>
-              <button type="button" class="tool-button" id="focus-board">Focus</button>
+              <button type="button" class="tool-button" id="focus-board" aria-pressed="false">Focus mode</button>
               <button type="button" class="tool-button" id="clear-pin">Clear pin</button>
             </div>
 
@@ -144,7 +145,7 @@
                 <li><kbd>1-9</kbd> fills a cell. <kbd>0</kbd>, <kbd>Delete</kbd>, or <kbd>Backspace</kbd> clears it.</li>
                 <li><kbd>Shift</kbd> + <kbd>1-9</kbd> freezes a digit. <kbd>Enter</kbd> or <kbd>Space</kbd> drops it into the selected cell.</li>
                 <li><kbd>N</kbd> toggles notes. <kbd>P</kbd> clears the frozen digit. <kbd>U</kbd> undoes.</li>
-                <li><kbd>H</kbd> hints, <kbd>C</kbd> checks, <kbd>G</kbd> starts a new board, and <kbd>B</kbd> jumps focus back.</li>
+                <li><kbd>H</kbd> hints, <kbd>F</kbd> toggles focus mode, <kbd>C</kbd> checks, <kbd>G</kbd> starts a new board, and <kbd>B</kbd> jumps focus back.</li>
               </ul>
             </section>
           </aside>
@@ -170,7 +171,7 @@
               required
             />
             <div class="player-actions">
-              <button type="submit" class="tool-button tool-button-strong">Start playing</button>
+              <button type="submit" class="tool-button tool-button-strong" id="start-playing">Start playing</button>
             </div>
           </form>
         </section>

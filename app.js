@@ -1,6 +1,7 @@
 const SIZE = 9;
 const BOX = 3;
 const DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const MAX_HINTS_PER_GAME = 3;
 const LEADERBOARD_KEY = "sudoku-afterglow-leaderboard-v2";
 const PLAYER_KEY = "sudoku-afterglow-player-v1";
 const DIFFICULTY_CONFIG = {
@@ -23,6 +24,7 @@ const state = {
   pinnedDigit: null,
   history: [],
   leaderboard: loadLeaderboard(),
+  focusMode: false,
   startedAt: Date.now(),
   elapsedBefore: 0,
   hintFlashIndex: null,
@@ -32,6 +34,7 @@ const state = {
 };
 
 const boardEl = document.getElementById("board");
+const pageShellEl = document.querySelector(".page-shell");
 const timerEl = document.getElementById("timer");
 const progressEl = document.getElementById("progress");
 const conflictsEl = document.getElementById("conflicts");
@@ -41,6 +44,7 @@ const statusEl = document.getElementById("status-line");
 const stageStateEl = document.getElementById("stage-state");
 const notesStateEl = document.getElementById("notes-state");
 const pinStateEl = document.getElementById("pin-state");
+const hintStateEl = document.getElementById("hint-state");
 const leaderboardHeadingEl = document.getElementById("leaderboard-heading");
 const leaderboardListEl = document.getElementById("leaderboard-list");
 const leaderboardEmptyEl = document.getElementById("leaderboard-empty");
@@ -59,6 +63,7 @@ const digitButtons = Array.from(document.querySelectorAll("[data-digit-button]")
 const sessionOverlayEl = document.getElementById("session-overlay");
 const playerFormEl = document.getElementById("player-form");
 const playerInputEl = document.getElementById("player-input");
+const startPlayingButton = document.getElementById("start-playing");
 
 const cellElements = [];
 let statusTone = "neutral";
@@ -382,6 +387,10 @@ function removePeerNotes(index, value) {
 }
 
 function currentElapsed() {
+  if (state.completed) {
+    return state.elapsedBefore;
+  }
+
   return state.elapsedBefore + (Date.now() - state.startedAt);
 }
 
@@ -437,9 +446,22 @@ function checkForCompletion() {
   const solved = state.board.every((value, index) => value === state.solution[index]);
 
   if (solved) {
+    state.elapsedBefore += Date.now() - state.startedAt;
+    state.startedAt = Date.now();
     state.completed = true;
     addLeaderboardEntry();
-    setStatus(`Board complete. ${DIFFICULTY_CONFIG[state.difficulty].label} time saved to the leaderboard.`, "success");
+    const difficultyKeys = Object.keys(DIFFICULTY_CONFIG);
+    const currentIndex = difficultyKeys.indexOf(state.difficulty);
+    const nextDifficulty = difficultyKeys[currentIndex + 1];
+    const player = state.playerName || "Player";
+    const nextMessage = nextDifficulty
+      ? ` Try ${DIFFICULTY_CONFIG[nextDifficulty].label} next.`
+      : " You finished the toughest stage. Try to beat your best time.";
+    setStatus(
+      `Congratulations, ${player}! ${DIFFICULTY_CONFIG[state.difficulty].label} complete in ${formatDuration(state.elapsedBefore)}.${nextMessage}`,
+      "success"
+    );
+    renderMeta();
     return true;
   }
 
@@ -574,6 +596,11 @@ function applyHint() {
     return;
   }
 
+  if (state.hintsUsed >= MAX_HINTS_PER_GAME) {
+    setStatus(`You have already used all ${MAX_HINTS_PER_GAME} hints for this game.`);
+    return;
+  }
+
   let index = state.selectedIndex;
 
   if (isFixed(index) || state.board[index] !== 0) {
@@ -595,7 +622,11 @@ function applyHint() {
   renderAll();
 
   if (!checkForCompletion()) {
-    setStatus(`Hint added at row ${rowOf(index) + 1}, column ${colOf(index) + 1}.`, "success");
+    const remainingHints = MAX_HINTS_PER_GAME - state.hintsUsed;
+    setStatus(
+      `Hint added at row ${rowOf(index) + 1}, column ${colOf(index) + 1}. ${state.hintsUsed}/${MAX_HINTS_PER_GAME} used, ${remainingHints} left.`,
+      "success"
+    );
   }
 }
 
@@ -744,13 +775,21 @@ function renderCompletedDigits() {
 }
 
 function renderModes() {
+  const remainingHints = Math.max(0, MAX_HINTS_PER_GAME - state.hintsUsed);
+
   stageStateEl.textContent = DIFFICULTY_CONFIG[state.difficulty].label;
   notesStateEl.textContent = state.notesMode ? "Notes on" : "Notes off";
   pinStateEl.textContent = state.pinnedDigit === null ? "Pin off" : `Pin ${state.pinnedDigit}`;
+  hintStateEl.textContent = `Hints ${state.hintsUsed}/${MAX_HINTS_PER_GAME} used, ${remainingHints} left`;
 
   notesStateEl.classList.toggle("is-on", state.notesMode);
   pinStateEl.classList.toggle("is-pinned", state.pinnedDigit !== null);
   notesButton.setAttribute("aria-pressed", String(state.notesMode));
+  hintButton.disabled = state.completed || state.hintsUsed >= MAX_HINTS_PER_GAME;
+  hintButton.textContent = state.hintsUsed >= MAX_HINTS_PER_GAME ? "No hints left" : `Hint (${remainingHints})`;
+  focusBoardButton.setAttribute("aria-pressed", String(state.focusMode));
+  focusBoardButton.textContent = state.focusMode ? "Exit focus" : "Focus mode";
+  pageShellEl.classList.toggle("focus-mode", state.focusMode);
 
   pinButtons.forEach((button) => {
     button.classList.toggle("is-active", Number(button.dataset.pinValue) === state.pinnedDigit);
@@ -792,6 +831,13 @@ function focusBoard() {
   cellElements[state.selectedIndex].focus();
 }
 
+function toggleFocusMode() {
+  state.focusMode = !state.focusMode;
+  renderModes();
+  focusBoard();
+  setStatus(state.focusMode ? "Focus mode on." : "Focus mode off.");
+}
+
 function startNewGame(difficulty = state.difficulty) {
   if (!state.playerName) {
     showPlayerPrompt();
@@ -802,6 +848,7 @@ function startNewGame(difficulty = state.difficulty) {
   state.history = [];
   state.notesMode = false;
   state.pinnedDigit = null;
+  state.focusMode = false;
   state.hintFlashIndex = null;
   state.completed = false;
   state.scoreSaved = false;
@@ -846,13 +893,12 @@ function hidePlayerPrompt() {
   sessionOverlayEl.hidden = true;
 }
 
-function submitPlayerName(event) {
-  event.preventDefault();
+function commitPlayerName() {
   const nextName = playerInputEl.value.trim();
 
   if (!nextName) {
     playerInputEl.focus();
-    return;
+    return false;
   }
 
   state.playerName = nextName;
@@ -865,6 +911,13 @@ function submitPlayerName(event) {
   } else {
     setStatus(`Player set to ${nextName}.`);
   }
+
+  return true;
+}
+
+function submitPlayerName(event) {
+  event.preventDefault();
+  commitPlayerName();
 }
 
 function initializeBoard() {
@@ -999,6 +1052,12 @@ function handleGlobalKeydown(event) {
     return;
   }
 
+  if (key === "f") {
+    event.preventDefault();
+    toggleFocusMode();
+    return;
+  }
+
   if (key === "p") {
     event.preventDefault();
     clearPinnedDigit();
@@ -1012,7 +1071,7 @@ function bindEvents() {
   undoButton.addEventListener("click", undoMove);
   hintButton.addEventListener("click", applyHint);
   checkButton.addEventListener("click", checkBoard);
-  focusBoardButton.addEventListener("click", focusBoard);
+  focusBoardButton.addEventListener("click", toggleFocusMode);
   clearPinButton.addEventListener("click", clearPinnedDigit);
   pinClearButton.addEventListener("click", clearPinnedDigit);
 
@@ -1040,6 +1099,7 @@ function bindEvents() {
   });
 
   playerFormEl.addEventListener("submit", submitPlayerName);
+  startPlayingButton.addEventListener("click", commitPlayerName);
   document.addEventListener("keydown", handleGlobalKeydown);
   window.setInterval(renderMeta, 1000);
 }
