@@ -10,6 +10,7 @@
     <div class="page-shell">
       <div class="backdrop backdrop-one" aria-hidden="true"></div>
       <div class="backdrop backdrop-two" aria-hidden="true"></div>
+      <div class="focus-backdrop" id="focus-backdrop" aria-label="Exit focus mode" role="button" tabindex="0"></div>
 
       <main class="app">
         <section class="panel topbar reveal">
@@ -143,7 +144,7 @@
               <ul class="shortcut-list">
                 <li><kbd>Arrow keys</kbd> or <kbd>W A S D</kbd> move around the grid.</li>
                 <li><kbd>1-9</kbd> fills a cell. <kbd>0</kbd>, <kbd>Delete</kbd>, or <kbd>Backspace</kbd> clears it.</li>
-                <li><kbd>Shift</kbd> + <kbd>1-9</kbd> freezes a digit. <kbd>Enter</kbd> or <kbd>Space</kbd> drops it into the selected cell.</li>
+                <li><kbd>Shift</kbd> + <kbd>1-9</kbd> freezes or unfreezes a digit. <kbd>Enter</kbd> or <kbd>Space</kbd> drops it into the selected cell.</li>
                 <li><kbd>N</kbd> toggles notes. <kbd>P</kbd> clears the frozen digit. <kbd>U</kbd> undoes.</li>
                 <li><kbd>H</kbd> hints, <kbd>F</kbd> toggles focus mode, <kbd>C</kbd> checks, <kbd>G</kbd> starts a new board, and <kbd>B</kbd> jumps focus back.</li>
               </ul>

@@ -35,6 +35,7 @@ const state = {
 
 const boardEl = document.getElementById("board");
 const pageShellEl = document.querySelector(".page-shell");
+const focusBackdropEl = document.getElementById("focus-backdrop");
 const timerEl = document.getElementById("timer");
 const progressEl = document.getElementById("progress");
 const conflictsEl = document.getElementById("conflicts");
@@ -561,7 +562,7 @@ function setPinnedDigit(digit) {
   if (state.pinnedDigit === null) {
     setStatus("Frozen digit cleared.");
   } else {
-    setStatus(`Frozen digit ${state.pinnedDigit}. Move around and press Enter to fill it.`);
+    setStatus(`Frozen digit ${state.pinnedDigit}. Tap any cell or press Enter to fill it.`);
   }
 }
 
@@ -770,7 +771,9 @@ function renderCompletedDigits() {
 
   digitButtons.forEach((button) => {
     const digit = Number(button.dataset.digitButton);
-    button.classList.toggle("is-complete", counts.get(digit) === 9);
+    const count = counts.get(digit);
+    button.classList.toggle("is-complete", count === 9);
+    button.dataset.remaining = Math.max(0, 9 - count);
   });
 }
 
@@ -942,6 +945,9 @@ function initializeBoard() {
 
     cell.addEventListener("click", () => {
       selectCell(index, { shouldFocus: true });
+      if (state.pinnedDigit !== null && !isFixed(index)) {
+        placePinnedDigit();
+      }
     });
 
     cell.addEventListener("focus", () => {
@@ -1101,6 +1107,9 @@ function bindEvents() {
   playerFormEl.addEventListener("submit", submitPlayerName);
   startPlayingButton.addEventListener("click", commitPlayerName);
   document.addEventListener("keydown", handleGlobalKeydown);
+  focusBackdropEl.addEventListener("click", () => {
+    if (state.focusMode) toggleFocusMode();
+  });
   window.setInterval(renderMeta, 1000);
 }
 
