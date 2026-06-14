@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sudoku Afterglow</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <div class="backdrop backdrop-one" aria-hidden="true"></div>
+      <div class="backdrop backdrop-two" aria-hidden="true"></div>
+
+      <main class="app">
+        <section class="panel topbar reveal">
+          <div class="title-block">
+            <p class="eyebrow">Keyboard-first Sudoku</p>
+            <h1>Sudoku Afterglow</h1>
+            <p class="hero-text">Bigger type, faster flow, and no mouse dependency.</p>
+          </div>
+
+          <div class="topbar-side">
+            <button type="button" class="player-card" id="edit-player" aria-label="Change player name">
+              <span class="player-label">Player</span>
+              <strong id="player-name">Guest</strong>
+            </button>
+
+            <div class="hero-stats" aria-label="Game status">
+              <div class="stat-card">
+                <span class="stat-label">Time</span>
+                <strong id="timer">00:00</strong>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Filled</span>
+                <strong id="progress">0 / 81</strong>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Conflicts</span>
+                <strong id="conflicts">0</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="layout">
+          <section class="panel game-panel reveal" aria-labelledby="board-heading">
+            <div class="panel-head">
+              <div>
+                <p class="section-kicker">Board</p>
+                <h2 id="board-heading">Five stages, one-screen play</h2>
+              </div>
+
+              <div class="difficulty-picker" aria-label="Stage chooser">
+                <button type="button" class="chip is-active" data-difficulty="stage1">1</button>
+                <button type="button" class="chip" data-difficulty="stage2">2</button>
+                <button type="button" class="chip" data-difficulty="stage3">3</button>
+                <button type="button" class="chip" data-difficulty="stage4">4</button>
+                <button type="button" class="chip" data-difficulty="stage5">5</button>
+              </div>
+            </div>
+
+            <div class="board-frame">
+              <div
+                id="board"
+                class="board"
+                role="grid"
+                aria-label="Sudoku board"
+                aria-describedby="status-line keyboard-help"
+              ></div>
+            </div>
+
+            <div class="status-strip">
+              <p id="status-line" class="status-line" aria-live="polite">Building your first puzzle...</p>
+              <div class="mode-pills" aria-label="Current modes">
+                <span class="mode-pill" id="stage-state">Stage 1</span>
+                <span class="mode-pill" id="notes-state">Notes off</span>
+                <span class="mode-pill" id="pin-state">Pin off</span>
+              </div>
+            </div>
+
+            <div class="tool-row" aria-label="Game controls">
+              <button type="button" class="tool-button tool-button-strong" id="new-game">New puzzle</button>
+              <button type="button" class="tool-button" id="toggle-notes" aria-pressed="false">Notes</button>
+              <button type="button" class="tool-button" id="undo-move">Undo</button>
+              <button type="button" class="tool-button" id="hint">Hint</button>
+              <button type="button" class="tool-button" id="check">Check</button>
+              <button type="button" class="tool-button" id="focus-board">Focus</button>
+              <button type="button" class="tool-button" id="clear-pin">Clear pin</button>
+            </div>
+
+            <div class="number-row" aria-label="Number pad">
+              <button type="button" class="number-key" data-value="1" data-digit-button="1">1</button>
+              <button type="button" class="number-key" data-value="2" data-digit-button="2">2</button>
+              <button type="button" class="number-key" data-value="3" data-digit-button="3">3</button>
+              <button type="button" class="number-key" data-value="4" data-digit-button="4">4</button>
+              <button type="button" class="number-key" data-value="5" data-digit-button="5">5</button>
+              <button type="button" class="number-key" data-value="6" data-digit-button="6">6</button>
+              <button type="button" class="number-key" data-value="7" data-digit-button="7">7</button>
+              <button type="button" class="number-key" data-value="8" data-digit-button="8">8</button>
+              <button type="button" class="number-key" data-value="9" data-digit-button="9">9</button>
+              <button type="button" class="number-key number-key-clear" data-clear="true">Clear</button>
+            </div>
+
+            <div class="pin-row" aria-label="Pin a digit">
+              <span class="pin-label">Freeze digit</span>
+              <div class="pin-grid">
+                <button type="button" class="pin-key" data-pin-value="1" data-digit-button="1">1</button>
+                <button type="button" class="pin-key" data-pin-value="2" data-digit-button="2">2</button>
+                <button type="button" class="pin-key" data-pin-value="3" data-digit-button="3">3</button>
+                <button type="button" class="pin-key" data-pin-value="4" data-digit-button="4">4</button>
+                <button type="button" class="pin-key" data-pin-value="5" data-digit-button="5">5</button>
+                <button type="button" class="pin-key" data-pin-value="6" data-digit-button="6">6</button>
+                <button type="button" class="pin-key" data-pin-value="7" data-digit-button="7">7</button>
+                <button type="button" class="pin-key" data-pin-value="8" data-digit-button="8">8</button>
+                <button type="button" class="pin-key" data-pin-value="9" data-digit-button="9">9</button>
+                <button type="button" class="pin-key pin-key-off" data-pin-clear="true">Off</button>
+              </div>
+            </div>
+          </section>
+
+          <aside class="side-stack">
+            <section class="panel reveal">
+              <div class="panel-head-simple">
+                <div>
+                  <p class="section-kicker">Leaderboard</p>
+                  <h2 id="leaderboard-heading">Best times for this stage</h2>
+                </div>
+              </div>
+
+              <ol class="leaderboard-list" id="leaderboard-list" aria-labelledby="leaderboard-heading"></ol>
+              <p class="leaderboard-empty" id="leaderboard-empty">Finish a puzzle to set the first time for this stage.</p>
+            </section>
+
+            <section class="panel reveal">
+              <div class="panel-head-simple">
+                <div>
+                  <p class="section-kicker">Shortcuts</p>
+                  <h2 id="keyboard-help">Fast keyboard play</h2>
+                </div>
+              </div>
+
+              <ul class="shortcut-list">
+                <li><kbd>Arrow keys</kbd> or <kbd>W A S D</kbd> move around the grid.</li>
+                <li><kbd>1-9</kbd> fills a cell. <kbd>0</kbd>, <kbd>Delete</kbd>, or <kbd>Backspace</kbd> clears it.</li>
+                <li><kbd>Shift</kbd> + <kbd>1-9</kbd> freezes a digit. <kbd>Enter</kbd> or <kbd>Space</kbd> drops it into the selected cell.</li>
+                <li><kbd>N</kbd> toggles notes. <kbd>P</kbd> clears the frozen digit. <kbd>U</kbd> undoes.</li>
+                <li><kbd>H</kbd> hints, <kbd>C</kbd> checks, <kbd>G</kbd> starts a new board, and <kbd>B</kbd> jumps focus back.</li>
+              </ul>
+            </section>
+          </aside>
+        </section>
+      </main>
+
+      <div class="session-overlay" id="session-overlay" hidden>
+        <section class="session-card" aria-labelledby="session-title">
+          <p class="eyebrow">Player setup</p>
+          <h2 id="session-title">Who is playing?</h2>
+          <p class="session-copy">Enter a name once and the leaderboard will keep building across sessions on this device.</p>
+
+          <form id="player-form" class="player-form">
+            <label class="player-label-block" for="player-input">Player name</label>
+            <input
+              id="player-input"
+              name="playerName"
+              class="player-input"
+              type="text"
+              maxlength="24"
+              autocomplete="name"
+              placeholder="Daughter, Dad, Mila..."
+              required
+            />
+            <div class="player-actions">
+              <button type="submit" class="tool-button tool-button-strong">Start playing</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
