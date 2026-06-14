@@ -84,6 +84,19 @@ function saveLeaderboard() {
   window.localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(state.leaderboard));
 }
 
+function isEditableTarget(target) {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  return (
+    target.isContentEditable ||
+    target.tagName === "INPUT" ||
+    target.tagName === "TEXTAREA" ||
+    target.tagName === "SELECT"
+  );
+}
+
 function shuffle(values) {
   const copy = [...values];
 
@@ -892,6 +905,10 @@ function initializeBoard() {
 }
 
 function handleGlobalKeydown(event) {
+  if (isEditableTarget(event.target)) {
+    return;
+  }
+
   if (event.altKey || event.ctrlKey || event.metaKey) {
     return;
   }
