@@ -57,6 +57,7 @@ const undoButton = document.getElementById("undo-move");
 const hintButton = document.getElementById("hint");
 const checkButton = document.getElementById("check");
 const focusBoardButton = document.getElementById("focus-board");
+const unfreezeButton = document.getElementById("unfreeze");
 const difficultyButtons = Array.from(document.querySelectorAll("[data-difficulty]"));
 const numberButtons = Array.from(document.querySelectorAll(".number-key"));
 const digitButtons = Array.from(document.querySelectorAll("[data-digit-button]"));
@@ -1107,6 +1108,7 @@ function bindEvents() {
   hintButton.addEventListener("click", applyHint);
   checkButton.addEventListener("click", checkBoard);
   focusBoardButton.addEventListener("click", toggleFocusMode);
+  unfreezeButton.addEventListener("click", clearPinnedDigit);
 
   difficultyButtons.forEach((button) => {
     button.addEventListener("click", () => {
