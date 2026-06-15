@@ -630,16 +630,36 @@ function applyHint() {
 
 function checkBoard() {
   const conflicts = computeConflicts(state.board);
+  const incorrectIndices = new Set();
+
+  for (let i = 0; i < state.board.length; i++) {
+    if (state.board[i] !== 0 && state.board[i] !== state.solution[i]) {
+      incorrectIndices.add(i);
+    }
+  }
 
   if (checkForCompletion()) {
     renderAll();
     return;
   }
 
-  if (conflicts.size > 0) {
-    const firstConflict = [...conflicts][0];
-    setStatus(`There are ${conflicts.size} conflicting cells to untangle.`, "alert");
-    selectCell(firstConflict, { shouldFocus: true });
+  const allErrors = new Set([...conflicts, ...incorrectIndices]);
+
+  if (allErrors.size > 0) {
+    const firstError = [...allErrors][0];
+    setStatus(`Found ${allErrors.size} incorrect ${allErrors.size === 1 ? 'cell' : 'cells'}.`, "alert");
+    selectCell(firstError, { shouldFocus: true });
+    
+    allErrors.forEach(idx => {
+      cellElements[idx].classList.add("cell-error");
+    });
+    
+    setTimeout(() => {
+      allErrors.forEach(idx => {
+        cellElements[idx].classList.remove("cell-error");
+      });
+    }, 2500);
+    
     return;
   }
 
@@ -647,8 +667,6 @@ function checkBoard() {
 
   if (empties > 0) {
     setStatus(`So far, so good. ${empties} cells left.`);
-  } else {
-    setStatus("Everything is filled, but at least one value is still off. Try a hint or undo.");
   }
 }
 
