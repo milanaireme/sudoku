@@ -261,7 +261,7 @@ input {
 }
 
 .chip.is-active,
-.pin-key.is-active {
+.number-key.is-active {
   background: var(--forest);
   color: white;
   box-shadow: 0 10px 24px rgba(47, 106, 93, 0.2);
@@ -472,8 +472,7 @@ input {
 }
 
 .tool-button,
-.number-key,
-.pin-key {
+.number-key {
   padding: 0.62rem 0.86rem;
   font-weight: 800;
   position: relative;
@@ -504,16 +503,14 @@ input {
   color: var(--accent-deep);
 }
 
-.number-key.is-complete,
-.pin-key.is-complete {
+.number-key.is-complete {
   color: rgba(32, 49, 57, 0.4);
   background:
     linear-gradient(135deg, rgba(47, 106, 93, 0.08), rgba(47, 106, 93, 0.03)),
     rgba(255, 251, 245, 0.75);
 }
 
-.number-key::after,
-.pin-key:not(.pin-key-off)::after {
+.number-key::after {
   content: attr(data-remaining);
   position: absolute;
   inset: auto 0.28rem 0.18rem auto;
@@ -529,38 +526,12 @@ input {
   display: none;
 }
 
-.number-key.is-complete::after,
-.pin-key.is-complete::after {
+.number-key.is-complete::after {
   content: "done";
   font-size: 0.52rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(47, 106, 93, 0.48);
-}
-
-.pin-row {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 0.7rem;
-}
-
-.pin-label {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 800;
-  color: var(--ink-soft);
-}
-
-.pin-key {
-  min-width: 2.5rem;
-  padding-block: 0.46rem;
-  font-size: 0.95rem;
-}
-
-.pin-key-off {
-  color: var(--accent-deep);
 }
 
 .leaderboard-list {
@@ -651,8 +622,7 @@ input {
 .page-shell.focus-mode .side-stack,
 .page-shell.focus-mode .panel-head,
 .page-shell.focus-mode .status-strip,
-.page-shell.focus-mode .tool-row,
-.page-shell.focus-mode .pin-row {
+.page-shell.focus-mode .tool-row {
   filter: blur(7px);
   opacity: 0.26;
   pointer-events: none;
@@ -847,7 +817,7 @@ kbd {
   }
 
   .board {
-    width: 100%;
+    width: min(100%, calc(100dvh - 14rem));
     border-radius: 12px;
   }
 
@@ -855,7 +825,7 @@ kbd {
     font-size: clamp(1.4rem, 6vw, 2rem);
   }
 
-  .number-key, .pin-key, .tool-button, .chip {
+  .number-key, .tool-button, .chip {
     padding: 0.5rem 0.6rem;
     min-width: 2.8rem;
     min-height: 2.8rem;
@@ -864,7 +834,7 @@ kbd {
     justify-content: center;
   }
 
-  .tool-row, .number-row, .pin-grid {
+  .tool-row, .number-row {
     gap: 0.35rem;
     justify-content: center;
   }

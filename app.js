@@ -55,11 +55,8 @@ const undoButton = document.getElementById("undo-move");
 const hintButton = document.getElementById("hint");
 const checkButton = document.getElementById("check");
 const focusBoardButton = document.getElementById("focus-board");
-const clearPinButton = document.getElementById("clear-pin");
 const difficultyButtons = Array.from(document.querySelectorAll("[data-difficulty]"));
 const numberButtons = Array.from(document.querySelectorAll(".number-key"));
-const pinButtons = Array.from(document.querySelectorAll("[data-pin-value]"));
-const pinClearButton = document.querySelector("[data-pin-clear='true']");
 const digitButtons = Array.from(document.querySelectorAll("[data-digit-button]"));
 const sessionOverlayEl = document.getElementById("session-overlay");
 const playerFormEl = document.getElementById("player-form");
@@ -306,7 +303,7 @@ function createSnapshot() {
     completed: state.completed,
     scoreSaved: state.scoreSaved,
     hintsUsed: state.hintsUsed,
-    elapsedBefore: state.elapsedBefore + (Date.now() - state.startedAt)
+    elapsedBefore: state.startedAt ? state.elapsedBefore + (Date.now() - state.startedAt) : state.elapsedBefore
   };
 }
 
@@ -388,7 +385,7 @@ function removePeerNotes(index, value) {
 }
 
 function currentElapsed() {
-  if (state.completed) {
+  if (state.completed || !state.startedAt) {
     return state.elapsedBefore;
   }
 
@@ -447,8 +444,8 @@ function checkForCompletion() {
   const solved = state.board.every((value, index) => value === state.solution[index]);
 
   if (solved) {
-    state.elapsedBefore += Date.now() - state.startedAt;
-    state.startedAt = Date.now();
+    state.elapsedBefore += state.startedAt ? Date.now() - state.startedAt : 0;
+    state.startedAt = null;
     state.completed = true;
     addLeaderboardEntry();
     const difficultyKeys = Object.keys(DIFFICULTY_CONFIG);
@@ -794,8 +791,8 @@ function renderModes() {
   focusBoardButton.textContent = state.focusMode ? "Exit focus" : "Focus mode";
   pageShellEl.classList.toggle("focus-mode", state.focusMode);
 
-  pinButtons.forEach((button) => {
-    button.classList.toggle("is-active", Number(button.dataset.pinValue) === state.pinnedDigit);
+  numberButtons.forEach((button) => {
+    button.classList.toggle("is-active", Number(button.dataset.value) === state.pinnedDigit);
   });
 }
 
@@ -1078,8 +1075,6 @@ function bindEvents() {
   hintButton.addEventListener("click", applyHint);
   checkButton.addEventListener("click", checkBoard);
   focusBoardButton.addEventListener("click", toggleFocusMode);
-  clearPinButton.addEventListener("click", clearPinnedDigit);
-  pinClearButton.addEventListener("click", clearPinnedDigit);
 
   difficultyButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -1094,13 +1089,7 @@ function bindEvents() {
         return;
       }
 
-      placeDigit(Number(button.dataset.value));
-    });
-  });
-
-  pinButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      setPinnedDigit(Number(button.dataset.pinValue));
+      setPinnedDigit(Number(button.dataset.value));
     });
   });
 
@@ -1110,6 +1099,20 @@ function bindEvents() {
   focusBackdropEl.addEventListener("click", () => {
     if (state.focusMode) toggleFocusMode();
   });
+
+  document.addEventListener("visibilitychange", () => {
+    if (state.completed) return;
+
+    if (document.hidden) {
+      if (state.startedAt) {
+        state.elapsedBefore += Date.now() - state.startedAt;
+        state.startedAt = null;
+      }
+    } else {
+      state.startedAt = Date.now();
+    }
+  });
+
   window.setInterval(renderMeta, 1000);
 }
 
