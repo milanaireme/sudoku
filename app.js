@@ -2,6 +2,7 @@ const SIZE = 9;
 const BOX = 3;
 const DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 const MAX_HINTS_PER_GAME = 3;
+const MAX_CHECKS_PER_GAME = 3;
 const LEADERBOARD_KEY = "sudoku-afterglow-leaderboard-v2";
 const PLAYER_KEY = "sudoku-afterglow-player-v1";
 const DIFFICULTY_CONFIG = {
@@ -30,7 +31,8 @@ const state = {
   hintFlashIndex: null,
   completed: false,
   scoreSaved: false,
-  hintsUsed: 0
+  hintsUsed: 0,
+  checksUsed: 0
 };
 
 const boardEl = document.getElementById("board");
@@ -303,6 +305,7 @@ function createSnapshot() {
     completed: state.completed,
     scoreSaved: state.scoreSaved,
     hintsUsed: state.hintsUsed,
+    checksUsed: state.checksUsed,
     elapsedBefore: state.startedAt ? state.elapsedBefore + (Date.now() - state.startedAt) : state.elapsedBefore
   };
 }
@@ -317,6 +320,7 @@ function restoreSnapshot(snapshot) {
   state.completed = snapshot.completed;
   state.scoreSaved = snapshot.scoreSaved;
   state.hintsUsed = snapshot.hintsUsed;
+  state.checksUsed = snapshot.checksUsed;
   state.elapsedBefore = snapshot.elapsedBefore;
   state.startedAt = Date.now();
 }
@@ -629,6 +633,12 @@ function applyHint() {
 }
 
 function checkBoard() {
+  if (state.checksUsed >= MAX_CHECKS_PER_GAME) {
+    setStatus(`You have already used all ${MAX_CHECKS_PER_GAME} checks for this game.`);
+    return;
+  }
+  state.checksUsed += 1;
+
   const conflicts = computeConflicts(state.board);
   const incorrectIndices = new Set();
 
@@ -794,6 +804,7 @@ function renderCompletedDigits() {
 
 function renderModes() {
   const remainingHints = Math.max(0, MAX_HINTS_PER_GAME - state.hintsUsed);
+  const remainingChecks = Math.max(0, MAX_CHECKS_PER_GAME - state.checksUsed);
 
   stageStateEl.textContent = DIFFICULTY_CONFIG[state.difficulty].label;
   notesStateEl.textContent = state.notesMode ? "Notes on" : "Notes off";
@@ -805,6 +816,8 @@ function renderModes() {
   notesButton.setAttribute("aria-pressed", String(state.notesMode));
   hintButton.disabled = state.completed || state.hintsUsed >= MAX_HINTS_PER_GAME;
   hintButton.textContent = state.hintsUsed >= MAX_HINTS_PER_GAME ? "No hints left" : `Hint (${remainingHints})`;
+  checkButton.disabled = state.completed || state.checksUsed >= MAX_CHECKS_PER_GAME;
+  checkButton.textContent = state.checksUsed >= MAX_CHECKS_PER_GAME ? "No checks left" : `Check (${remainingChecks})`;
   focusBoardButton.setAttribute("aria-pressed", String(state.focusMode));
   focusBoardButton.textContent = state.focusMode ? "Exit focus" : "Focus mode";
   pageShellEl.classList.toggle("focus-mode", state.focusMode);
@@ -871,6 +884,7 @@ function startNewGame(difficulty = state.difficulty) {
   state.completed = false;
   state.scoreSaved = false;
   state.hintsUsed = 0;
+  state.checksUsed = 0;
 
   difficultyButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.difficulty === difficulty);
