@@ -627,8 +627,7 @@ input {
 .page-shell.focus-mode .topbar,
 .page-shell.focus-mode .side-stack,
 .page-shell.focus-mode .panel-head,
-.page-shell.focus-mode .status-strip,
-.page-shell.focus-mode .tool-row {
+.page-shell.focus-mode .status-strip {
   filter: blur(7px);
   opacity: 0.26;
   pointer-events: none;
@@ -649,6 +648,7 @@ input {
 }
 
 .page-shell.focus-mode .board-frame,
+.page-shell.focus-mode .tool-row,
 .page-shell.focus-mode .number-row {
   position: relative;
   z-index: 2;
@@ -808,6 +808,10 @@ kbd {
 }
 
 @media (max-width: 600px) {
+  #shortcuts-panel {
+    display: none;
+  }
+
   .app {
     padding: 0.4rem;
     gap: 0.4rem;
