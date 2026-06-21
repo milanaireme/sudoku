@@ -431,11 +431,6 @@ input {
   margin: 0;
   font-size: 0.95rem;
   color: var(--ink-soft);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-  min-width: 0;
 }
 
 .status-line.is-success {
