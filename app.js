@@ -480,7 +480,7 @@ function placeDigit(digit) {
   }
 
   if (isFixed(index)) {
-    setStatus("That clue is fixed. Move to an empty or editable cell.");
+    setStatus("That clue is fixed.");
     return;
   }
 
@@ -518,7 +518,7 @@ function placeDigit(digit) {
 
 function placePinnedDigit() {
   if (state.pinnedDigit === null) {
-    setStatus("Freeze a digit first, then use Enter or Space to place it.");
+    setStatus("Freeze a digit first.");
     return;
   }
 
@@ -564,7 +564,7 @@ function setPinnedDigit(digit) {
   if (state.pinnedDigit === null) {
     setStatus("Frozen digit cleared.");
   } else {
-    setStatus(`Frozen digit ${state.pinnedDigit}. Tap any cell or press Enter to fill it.`);
+    setStatus(`Frozen ${state.pinnedDigit}. Tap a cell to place.`);
   }
 }
 
@@ -600,7 +600,7 @@ function applyHint() {
   }
 
   if (state.hintsUsed >= MAX_HINTS_PER_GAME) {
-    setStatus(`You have already used all ${MAX_HINTS_PER_GAME} hints for this game.`);
+    setStatus(`All ${MAX_HINTS_PER_GAME} hints used.`);
     return;
   }
 
@@ -635,7 +635,7 @@ function applyHint() {
 
 function checkBoard() {
   if (state.checksUsed >= MAX_CHECKS_PER_GAME) {
-    setStatus(`You have already used all ${MAX_CHECKS_PER_GAME} checks for this game.`);
+    setStatus(`All ${MAX_CHECKS_PER_GAME} checks used.`);
     return;
   }
   state.checksUsed += 1;
